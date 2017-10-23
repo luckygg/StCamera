@@ -1,5 +1,5 @@
 //-----------------------------------------------------------------------
-// Sentech Test Class v1.0.0. (with Sentech Common SDK v1.0.1)
+// Sentech Test Class v1.0.1. (with Sentech Common SDK v1.0.1)
 //
 // Copyright (c) 2017, FAINSTEC,.CO.LTD. 
 //

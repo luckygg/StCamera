@@ -66,6 +66,7 @@ bool CStCamera::OnSearchSystem()
 			for (int j=0; j<nIfCnt; j++)
 			{
 				StInterfaceInfo IfInfo;
+				m_pIStSystemList[i]->GetIStInterface(j)->UpdateDeviceList();
 				IfInfo.strName		= (CString)m_pIStSystemList[i]->GetIStInterface(j)->GetIStInterfaceInfo()->GetDisplayName().c_str();
 				IfInfo.strType		= (CString)m_pIStSystemList[i]->GetIStInterface(j)->GetIStInterfaceInfo()->GetTLType().c_str();
 				IfInfo.strMacAddr	= (CString)m_pIStSystemList[i]->GetIStInterface(j)->GetIStInterfaceInfo()->GetID().c_str();
