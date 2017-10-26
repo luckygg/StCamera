@@ -154,6 +154,24 @@ BOOL CFTech_StCameraDlg::OnInitDialog()
 	pList->InsertColumn(5, _T("Access"), LVCFMT_CENTER, 80, -1);
 
 	CheckRadioButton(IDC_RBTN_CAM1, IDC_RBTN_CAM2, IDC_RBTN_CAM1);
+
+	SetTimer(100, 300, NULL);
+
+	for (int i=0; i<MAX_CAM; i++)
+	{
+		m_bThDsp[i] = true;
+
+		switch (i)
+		{
+		case 0 :
+			m_pThDsp[m_rbtnCam] = AfxBeginThread(DisplayThreadCam1, this);
+			break;
+		case 1 :
+			m_pThDsp[m_rbtnCam] = AfxBeginThread(DisplayThreadCam2, this);
+			break;
+		}
+	}
+	
 	return TRUE;  // return TRUE  unless you set the focus to a control
 }
 
@@ -249,6 +267,10 @@ void CFTech_StCameraDlg::OnBnClickedBtnConnection()
 			{
 				bpp = 24;
 				m_CamInfo[m_rbtnCam].bColor = true;
+
+				GetDlgItem(IDC_BTN_AWB)->EnableWindow(TRUE);
+				GetDlgItem(IDC_CB_WBPRESET)->EnableWindow(TRUE);
+				GetDlgItem(IDC_BTN_WBSAVE)->EnableWindow(TRUE);
 			}
 
 			m_nWidth[m_rbtnCam] = w;
@@ -263,10 +285,6 @@ void CFTech_StCameraDlg::OnBnClickedBtnConnection()
 		{
 			if (m_Camera[m_rbtnCam].IsActived() == true)
 				m_Camera[m_rbtnCam].OnStopAcquisition();
-
-			m_bThDsp[m_rbtnCam] = false;
-			if (m_pThDsp[m_rbtnCam] != NULL)
-				WaitForSingleObject(m_pThDsp[m_rbtnCam]->m_hThread, 5000);
 
 			m_Camera[m_rbtnCam].OnDisconnect();
 
@@ -298,27 +316,15 @@ void CFTech_StCameraDlg::OnBnClickedBtnAcq()
 
 		if (strCaption == _T("Start"))
 		{
-			SetTimer(100, 300, NULL);
 			m_Camera[m_rbtnCam].OnStartAcquisition();
 
-			m_bThDsp[m_rbtnCam] = true;
-			if (m_rbtnCam == 0)
-				m_pThDsp[m_rbtnCam] = AfxBeginThread(DisplayThreadCam1, this);
-			else if (m_rbtnCam == 1)
-				m_pThDsp[m_rbtnCam] = AfxBeginThread(DisplayThreadCam2, this);
-		
 			SetDlgItemText(IDC_BTN_ACQ, _T("Stop"));
 
 			m_CamInfo[m_rbtnCam].bActived = true;
 		}
 		else
 		{
-			KillTimer(100);
 			m_Camera[m_rbtnCam].OnStopAcquisition();
-
-			m_bThDsp[m_rbtnCam] = false;
-			if (m_pThDsp[m_rbtnCam] != NULL)
-				WaitForSingleObject(m_pThDsp[m_rbtnCam]->m_hThread, 5000);
 		
 			SetDlgItemText(IDC_BTN_ACQ, _T("Start"));
 
@@ -636,31 +642,30 @@ void CFTech_StCameraDlg::OnTimer(UINT_PTR nIDEvent)
 {
 	if (nIDEvent == 100)
 	{
-		if (m_Camera[0].IsConnected() == false)
-			return;
+		for (int i=0; i<MAX_CAM; i++)
+		{
+			if (m_Camera[i].IsConnected() == false)
+				return;
 
-		double time = m_Camera[0].GetGrabTactTimeMS();
-		uint64_t total = m_Camera[0].GetTotalImageCount();
-		uint64_t drop = m_Camera[0].GetDroppedImageCount();
+			double time = m_Camera[i].GetGrabTactTimeMS();
+			uint64_t total = m_Camera[i].GetTotalImageCount();
+			uint64_t drop = m_Camera[i].GetDroppedImageCount();
 
-		CString strInfo=_T("");
-		double dFps = (1/time)*1000;
-		strInfo.Format(_T("%.3f fps / %d / %d (drop / total)"), dFps, drop, total);
+			CString strInfo=_T("");
+			double dFps = (1/time)*1000;
+			strInfo.Format(_T("%.3f fps / %d / %d (drop / total)"), dFps, drop, total);
 
-		SetDlgItemText(IDC_LB_INFO1, strInfo);
-
-		if (m_Camera[1].IsConnected() == false)
-			return;
-
-		time = m_Camera[1].GetGrabTactTimeMS();
-		total = m_Camera[1].GetTotalImageCount();
-		drop = m_Camera[1].GetDroppedImageCount();
-
-		strInfo=_T("");
-		dFps = (1/time)*1000;
-		strInfo.Format(_T("%.3f fps / %d / %d (drop / total)"), dFps, drop, total);
-
-		SetDlgItemText(IDC_LB_INFO2, strInfo);
+			switch (i)
+			{
+			case 0 :
+				SetDlgItemText(IDC_LB_INFO1, strInfo);
+				break;
+			case 1 :
+				SetDlgItemText(IDC_LB_INFO2, strInfo);
+				break;
+			}
+			
+		}
 	}
 
 	CDialogEx::OnTimer(nIDEvent);

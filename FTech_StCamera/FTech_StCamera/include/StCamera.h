@@ -1,5 +1,5 @@
 //-----------------------------------------------------------------------
-// Sentech Test Class v1.0.1. (with Sentech Common SDK v1.0.1)
+// Sentech Test Class v1.1.0. (with Sentech Common SDK v1.0.1)
 //
 // Copyright (c) 2017, FAINSTEC,.CO.LTD. 
 //
@@ -356,7 +356,7 @@ private :
 	IStImageBuffer*				m_pIStImageBuff;			// Image Buffer.
 	CIStDevicePtr				m_pIStDevice;				// Device Pointer.
 	CIStDataStreamPtr			m_pIStDataStream;			// Data Stream Pointer.
-	CIStSystemPtrArray			m_objIStSystemPtrList;		// System Pointer Array.
+	//CIStSystemPtrArray			m_objIStSystemPtrList;		// System Pointer Array.
 	CIStRegisteredCallbackPtr	m_pIStCallbackDeviceLost;	// Callback Pointer.
 	CIStNodeMapDisplayWndPtr	m_pIStNodeMapDisplayWnd;	// Nodemap Display Window Pointer.
 	CIStVideoFilerPtr			m_pIStVideoFiler;			// Video Filer Pointer.
